@@ -1,43 +1,39 @@
-from flask import Flask, request, jsonify, render_template
-import pandas as pd
+# Importing essential libraries
+from flask import Flask, render_template, request
+import pickle
 import numpy as np
-from xgboost import XGBClassifier
-from sklearn.preprocessing import StandardScaler
-import pickle  # For model saving and loading
+
+# Load the trained machine learning model
+filename = 'best_xgb_model.pkl.pkl'
+model = pickle.load(open(filename, 'rb'))
 
 app = Flask(__name__)
 
-# Load your trained model and scaler (replace with your file paths)
-with open('best_xgb_model.pkl', 'rb') as f:
-    best_xgb = pickle.load(f)
-
-with open('scaler.pkl', 'rb') as f:
-    scaler = pickle.load(f)
-
-with open('x_columns.pkl', 'rb') as f:
-    X_columns = pickle.load(f)
-
-def predict_stroke(input_data):
-    user_input = pd.DataFrame([input_data])
-    missing_cols = set(X_columns) - set(user_input.columns)
-    for col in missing_cols:
-        user_input[col] = 0
-    user_input = user_input[X_columns]
-    numeric_features = ["Age", "Cholesterol", "BMI"]
-    user_input[numeric_features] = scaler.transform(user_input[numeric_features])
-    stroke_prob = best_xgb.predict_proba(user_input)[:, 1][0]
-    stroke_prediction = "Yes" if stroke_prob > 0.5 else "No"
-    return stroke_prediction, stroke_prob * 100
-
 @app.route('/')
-def index():
-    return render_template('index.html')  # Serve index.html
+def home():
+    return render_template('main.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.get_json()
-    stroke_risk, stroke_probability = predict_stroke(data)
-    return jsonify({'stroke_risk': stroke_risk, 'stroke_probability': round(stroke_probability, 2)})
+    if request.method == 'POST':
+        # Extract input values from form
+        age = int(request.form['age'])
+        sex = int(request.form['sex'])  # Assuming binary encoding (0/1)
+        bmi = float(request.form['bmi'])
+        smoking = int(request.form['smoking'])
+        diabetes = int(request.form['diabetes'])
+        hypertension = int(request.form['hypertension'])
+        atrial_fibrillation = int(request.form['atrial_fibrillation'])
+        cholesterol = float(request.form['cholesterol'])
+        previous_stroke = int(request.form['previous_stroke'])
+
+        # Create feature array in the correct order
+        data = np.array([[age, sex, bmi, smoking, diabetes, hypertension, atrial_fibrillation, cholesterol, previous_stroke]])
+        
+        # Make prediction
+        my_prediction = model.predict(data)
+
+        return render_template('result.html', prediction=my_prediction[0])
 
 if __name__ == '__main__':
     app.run(debug=True)
