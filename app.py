@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # Load the model from .pkl file
-with open('strokemodel.pkl', 'rb') as f:
+with open('strokemodel2.0.pkl', 'rb') as f:
     model = pickle.load(f)
 
 @app.route('/')
