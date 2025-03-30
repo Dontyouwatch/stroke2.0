@@ -1,9 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import pandas as pd
 import numpy as np
 from xgboost import XGBClassifier
 from sklearn.preprocessing import StandardScaler
-import pickle # For model saving and loading
+import pickle  # For model saving and loading
 
 app = Flask(__name__)
 
@@ -28,6 +28,10 @@ def predict_stroke(input_data):
     stroke_prob = best_xgb.predict_proba(user_input)[:, 1][0]
     stroke_prediction = "Yes" if stroke_prob > 0.5 else "No"
     return stroke_prediction, stroke_prob * 100
+
+@app.route('/')
+def index():
+    return render_template('index.html')  # Serve index.html
 
 @app.route('/predict', methods=['POST'])
 def predict():
