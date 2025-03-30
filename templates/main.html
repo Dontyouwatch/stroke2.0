@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stroke Risk Predictor</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://kit.fontawesome.com/5f3f547070.js" crossorigin="anonymous"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Website Title -->
+  <div class="container">
+    <h2 class='container-heading'><span class="heading_font">Stroke Risk Predictor</span></h2>
+    <div class='description'>
+      <p>A Machine Learning Web Application that predicts the chances of having a stroke. Built with Flask and deployed using Render.</p><br>
+      <p>(Note: This model is trained for high accuracy stroke prediction.)</p>
+    </div>
+  </div>
+
+  <!-- Input Form -->
+  <div class="ml-container">
+    <form action="{{ url_for('predict')}}" method="POST"> 
+      <label for="age">Age</label>
+      <input type="text" id="age" name="age" placeholder="Enter your age"><br>
+
+      <label for="sex">Sex</label>
+      <select id="sex" name="sex">
+        <option selected>----select option----</option>
+        <option value="1">Male</option>
+        <option value="0">Female</option>
+      </select><br>
+
+      <label for="bmi">BMI (Body Mass Index)</label>
+      <input type="text" id="bmi" name="bmi" placeholder="Enter BMI value"><br>
+
+      <label for="smoking">Smoking Status</label>
+      <select id="smoking" name="smoking">
+        <option selected>----select option----</option>
+        <option value="1">Smoker</option>
+        <option value="0">Non-Smoker</option>
+      </select><br>
+
+      <label for="diabetes">Diabetes</label>
+      <select id="diabetes" name="diabetes">
+        <option selected>----select option----</option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select><br>
+
+      <label for="hypertension">Hypertension</label>
+      <select id="hypertension" name="hypertension">
+        <option selected>----select option----</option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select><br>
+
+      <label for="atrial_fibrillation">Atrial Fibrillation</label>
+      <select id="atrial_fibrillation" name="atrial_fibrillation">
+        <option selected>----select option----</option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select><br>
+
+      <label for="cholesterol">Cholesterol Levels</label>
+      <input type="text" id="cholesterol" name="cholesterol" placeholder="Enter cholesterol level (mg/dL)"><br>
+
+      <label for="previous_stroke">Previous Stroke</label>
+      <select id="previous_stroke" name="previous_stroke">
+        <option selected>----select option----</option>
+        <option value="1">Yes</option>
+        <option value="0">No</option>
+      </select><br>
+
+      <input type="submit" class="my-cta-button" value="Predict">
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <div class='footer'>
+    <div class="contact">
+      <a target="_blank" href="https://github.com/yourgithubrepo"><i class="fab fa-github fa-lg contact-icon"></i></a>
+    </div>
+    <p class='footer-description'>Customized by [Your Name].</p>
+  </div>
+</body>
+</html>
