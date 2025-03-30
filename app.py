@@ -1,51 +1,39 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify
 import pandas as pd
-import pickle
-import os
+import numpy as np
+from xgboost import XGBClassifier
+from sklearn.preprocessing import StandardScaler
+import pickle # For model saving and loading
 
 app = Flask(__name__)
 
-# Load the model from .pkl file
-with open('strokemodel2.0.pkl', 'rb') as f:
-    model = pickle.load(f)
+# Load your trained model and scaler (replace with your file paths)
+with open('best_xgb_model.pkl', 'rb') as f:
+    best_xgb = pickle.load(f)
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+with open('scaler.pkl', 'rb') as f:
+    scaler = pickle.load(f)
+
+with open('x_columns.pkl', 'rb') as f:
+    X_columns = pickle.load(f)
+
+def predict_stroke(input_data):
+    user_input = pd.DataFrame([input_data])
+    missing_cols = set(X_columns) - set(user_input.columns)
+    for col in missing_cols:
+        user_input[col] = 0
+    user_input = user_input[X_columns]
+    numeric_features = ["Age", "Cholesterol", "BMI"]
+    user_input[numeric_features] = scaler.transform(user_input[numeric_features])
+    stroke_prob = best_xgb.predict_proba(user_input)[:, 1][0]
+    stroke_prediction = "Yes" if stroke_prob > 0.5 else "No"
+    return stroke_prediction, stroke_prob * 100
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    try:
-        # Get form data
-        data = {
-            'Age': float(request.form['age']),
-            'Sex': int(request.form['sex']),
-            'BMI': float(request.form['bmi']),
-            'Smoking': int(request.form['smoking']),
-            'Diabetes': int(request.form['diabetes']),
-            'Hypertension': float(request.form['hypertension']),
-            'Atrial_Fibrillation': int(request.form['afib']),
-            'Cholesterol': float(request.form['cholesterol']),
-            'Previous_Stroke': int(request.form['previous_stroke'])
-        }
-        
-        # Convert to DataFrame
-        input_df = pd.DataFrame([data])
-        
-        # Make prediction
-        prediction = model.predict(input_df)[0]
-        probability = model.predict_proba(input_df)[0][1] * 100
-        
-        # Format result
-        result = {
-            'prediction': 'High Risk of Stroke' if prediction == 1 else 'Low Risk of Stroke',
-            'probability': f"{probability:.2f}%"
-        }
-        
-        return render_template('index.html', result=result, form_data=data)
-    
-    except Exception as e:
-        return jsonify({'error': str(e)}), 400
+    data = request.get_json()
+    stroke_risk, stroke_probability = predict_stroke(data)
+    return jsonify({'stroke_risk': stroke_risk, 'stroke_probability': round(stroke_probability, 2)})
 
 if __name__ == '__main__':
     app.run(debug=True)
