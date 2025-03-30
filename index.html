@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Risk Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            background: #e8f4fc;
+            display: {% if result %}block{% else %}none{% endif %};
+        }
+        .high-risk {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .low-risk {
+            color: #27ae60;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stroke Risk Prediction</h1>
+    
+    <div class="form-container">
+        <form action="/predict" method="POST">
+            <div class="form-group">
+                <label for="age">Age:</label>
+                <input type="number" id="age" name="age" min="25" max="90" required value="{{ form_data.age if form_data }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="sex">Sex:</label>
+                <select id="sex" name="sex" required>
+                    <option value="0" {% if form_data and form_data.sex == 0 %}selected{% endif %}>Female</option>
+                    <option value="1" {% if form_data and form_data.sex == 1 %}selected{% endif %}>Male</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="bmi">BMI:</label>
+                <input type="number" id="bmi" name="bmi" min="18" max="40" step="0.1" required value="{{ form_data.bmi if form_data }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="smoking">Smoking Status:</label>
+                <select id="smoking" name="smoking" required>
+                    <option value="0" {% if form_data and form_data.smoking == 0 %}selected{% endif %}>Non-smoker</option>
+                    <option value="1" {% if form_data and form_data.smoking == 1 %}selected{% endif %}>Smoker</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="diabetes">Diabetes:</label>
+                <select id="diabetes" name="diabetes" required>
+                    <option value="0" {% if form_data and form_data.diabetes == 0 %}selected{% endif %}>No</option>
+                    <option value="1" {% if form_data and form_data.diabetes == 1 %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="hypertension">Hypertension (Systolic BP):</label>
+                <input type="number" id="hypertension" name="hypertension" min="90" max="200" required value="{{ form_data.hypertension if form_data }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="afib">Atrial Fibrillation:</label>
+                <select id="afib" name="afib" required>
+                    <option value="0" {% if form_data and form_data.afib == 0 %}selected{% endif %}>No</option>
+                    <option value="1" {% if form_data and form_data.afib == 1 %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="cholesterol">Cholesterol (mg/dL):</label>
+                <input type="number" id="cholesterol" name="cholesterol" min="150" max="300" required value="{{ form_data.cholesterol if form_data }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="previous_stroke">Previous Stroke:</label>
+                <select id="previous_stroke" name="previous_stroke" required>
+                    <option value="0" {% if form_data and form_data.previous_stroke == 0 %}selected{% endif %}>No</option>
+                    <option value="1" {% if form_data and form_data.previous_stroke == 1 %}selected{% endif %}>Yes</option>
+                </select>
+            </div>
+            
+            <button type="submit">Predict Stroke Risk</button>
+        </form>
+        
+        {% if result %}
+        <div class="result">
+            <h3>Prediction Result:</h3>
+            <p>Risk Level: <span class="{{ 'high-risk' if result.prediction == 'High Risk of Stroke' else 'low-risk' }}">{{ result.prediction }}</span></p>
+            <p>Probability: {{ result.probability }}</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
