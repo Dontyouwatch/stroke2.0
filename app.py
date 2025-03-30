@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 
 # Load the trained machine learning model
-filename = 'best_xgb_model.pkl.pkl'
+filename = 'best_xgb_model.pkl'
 model = pickle.load(open(filename, 'rb'))
 
 app = Flask(__name__)
